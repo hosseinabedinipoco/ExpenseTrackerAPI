@@ -19,7 +19,7 @@ class login(APIView):
 
     def post(self, request):
         email = request.data.get('email')
-        password = request.date.get('password')
+        password = request.data.get('password')
         user = get_object_or_404(User, email=email) 
         if user.check_password(password):
             refresh = RefreshToken.for_user(user=user)
@@ -36,7 +36,7 @@ class signup(APIView):
         data = request.data
         user = UserSerializer(data=data)
         if user.is_valid():
-            if data['otp'] == r.get(data['email']):
+            if int(data['otp']) == int(r.get(data['email'])):
                 user.save()
                 return Response(user.data, status=status.HTTP_201_CREATED)
             else :
@@ -55,7 +55,7 @@ class send_otp(APIView):
         password = "rauxzpjalhevxjvz"
         num = random.randint(1000, 9999)
         message = str(num)
-        r.setex(receiver_email, message, 120)
+        r.setex(receiver_email, 120, message)
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
             server.login(sender_email, password)
