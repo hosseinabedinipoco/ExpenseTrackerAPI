@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import redis
 import smtplib, ssl, random
+from .serializer import UserSerializer
 
 # Create your views here.
 
@@ -32,7 +33,17 @@ class signup(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        pass
+        data = request.data
+        user = UserSerializer(data=data)
+        if user.is_valid():
+            if data['otp'] == r.get(data['email']):
+                user.save()
+                return Response(user.data, status=status.HTTP_201_CREATED)
+            else :
+                return Response({'error':'otp is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class send_otp(APIView):
     permission_classes = [AllowAny]
