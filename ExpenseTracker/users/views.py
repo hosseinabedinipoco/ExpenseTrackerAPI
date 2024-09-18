@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from django.shortcuts import get_object_or_404
@@ -9,6 +9,7 @@ from rest_framework import status
 import redis
 import smtplib, ssl, random
 from .serializer import UserSerializer
+
 
 # Create your views here.
 
@@ -61,3 +62,4 @@ class send_otp(APIView):
             server.login(sender_email, password)
             server.sendmail(sender_email, receiver_email, message)
         return Response({'message':'seccusful'}, status=status.HTTP_200_OK)    
+
