@@ -44,7 +44,7 @@ class DeleteExpense(APIView):
             return Response({'error':'you dont access'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class GetExpense(APIView):
+class GetAllExpense(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         start = request.GET.get('s')
@@ -52,3 +52,14 @@ class GetExpense(APIView):
         expenses = Expense.objects.filter(Q(date__gte=start) & Q(date__lte=end) & Q(author=request.user))
         serializer = ExpenseSerializer(expenses, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class GetExpense(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request, id):
+        expense = get_object_or_404(Expense, pk=id)
+        if expense.author == request.user:
+            serializer = ExpenseSerializer(serializer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'error':'you dont access'}, status=status.HTTP_401_UNAUTHORIZED)
+   
