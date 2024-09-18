@@ -35,8 +35,14 @@ class UpdateExpense(APIView):
 class DeleteExpense(APIView):
     permission_classes = [IsAuthenticated]
     def delete(self, request, id):
-        pass    
-
+        expense = get_object_or_404(Expense, pk=id)
+        if expense.author == request.user :
+            expense.delete()
+            return Response({'messgae':"deleted"}, status=status.HTTP_200_OK)
+        else:    
+            return Response({'error':'you dont access'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+         
 class GetExpense(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
