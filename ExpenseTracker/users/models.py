@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import check_password as check
 class User(AbstractUser):
     email = models.EmailField(max_length=50, unique=True)
     password = models.CharField(max_length=300)
+    username = models.CharField(max_length=150, unique=False, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

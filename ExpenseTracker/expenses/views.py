@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializer import ExpenseSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 class AddExpense(APIView):
@@ -20,7 +21,16 @@ class AddExpense(APIView):
 class UpdateExpense(APIView):
     permission_classes = [IsAuthenticated]
     def put(self, request, id):
-        pass    
+        expense = get_object_or_404(Expense, pk=id)
+        if expense.author == request.user:
+            serializer = ExpenseSerializer(expense, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error':'you dont access'}, status=status.HTTP_401_UNAUTHORIZED)    
 
 class DeleteExpense(APIView):
     permission_classes = [IsAuthenticated]
