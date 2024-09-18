@@ -6,6 +6,7 @@ from .serializer import ExpenseSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 # Create your views here.
 
 class AddExpense(APIView):
@@ -41,9 +42,13 @@ class DeleteExpense(APIView):
             return Response({'messgae':"deleted"}, status=status.HTTP_200_OK)
         else:    
             return Response({'error':'you dont access'}, status=status.HTTP_401_UNAUTHORIZED)
-        
-         
+
+
 class GetExpense(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        pass    
+        start = request.GET.get('s')
+        end = request.GET.get('e')
+        expenses = Expense.objects.filter(Q(date__gte=start) & Q(date__lte=end) & Q(author=request.user))
+        serializer = ExpenseSerializer(expenses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
